@@ -183,7 +183,7 @@ with st.sidebar:
                             10, 200, 50, 10)
     run_btn    = st.button("Run SubgraphX Explanation", type="primary", use_container_width=True)
     st.markdown("---")
-    st.caption("Model: GIN  |  Dataset: MUTAG (Debnath et al., 1991)")
+    st.caption("Model: GIN  |  Dataset: MUTAG")
 
 # ── Molecule info ─────────────────────────────────────────────────────────────
 data = copy.deepcopy(dataset[mol_idx])
