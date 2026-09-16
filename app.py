@@ -39,25 +39,33 @@ ATOM_SYMBOLS = {0: "C", 1: "N", 2: "O", 3: "F", 4: "I", 5: "Cl", 6: "Br"}
 
 # ── GIN model (must match what was saved) ─────────────────────────────────────
 class GINClassifier(torch.nn.Module):
-    def __init__(self, in_channels: int, hidden: int = 64, num_layers: int = 3,
-                 dropout: float = 0.3, num_classes: int = 2):
+    """
+    Architecture must exactly match what was saved in gin_mutag_checkpoint.pt.
+    Checkpoint keys: conv1/conv2/conv3 (individual attrs) + classifier (single Linear).
+    """
+    def __init__(self, in_channels: int, hidden: int = 64, num_classes: int = 2):
         super().__init__()
-        self.convs = torch.nn.ModuleList()
-        for i in range(num_layers):
-            in_ch = in_channels if i == 0 else hidden
-            mlp = Sequential(Linear(in_ch, hidden), BatchNorm1d(hidden),
-                              ReLU(), Linear(hidden, hidden))
-            self.convs.append(GINConv(mlp, train_eps=True))
-        self.classifier = Sequential(
-            Linear(hidden, hidden // 2), ReLU(),
-            torch.nn.Dropout(dropout), Linear(hidden // 2, num_classes),
-        )
+
+        def make_mlp(in_ch, out_ch):
+            return Sequential(
+                Linear(in_ch, out_ch),
+                BatchNorm1d(out_ch),
+                ReLU(),
+                Linear(out_ch, out_ch),
+            )
+
+        self.conv1 = GINConv(make_mlp(in_channels, hidden), train_eps=True)
+        self.conv2 = GINConv(make_mlp(hidden, hidden),      train_eps=True)
+        self.conv3 = GINConv(make_mlp(hidden, hidden),      train_eps=True)
+        self.classifier = Linear(hidden, num_classes)
 
     def forward(self, x, edge_index, batch):
-        for conv in self.convs:
-            x = conv(x, edge_index).relu()
+        x = self.conv1(x, edge_index).relu()
+        x = self.conv2(x, edge_index).relu()
+        x = self.conv3(x, edge_index).relu()
         x = global_add_pool(x, batch)
         return self.classifier(x)
+
 
 
 # ── Shapley-based subgraph scoring ───────────────────────────────────────────
