@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Dataset (will be auto-downloaded by PyG on first run)
+dataset/
+
+# Large output artefacts — gin_best.pt in root IS committed (it's small ~100 KB)
+outputs/
+
+# OS
+.DS_Store
+Thumbs.db
