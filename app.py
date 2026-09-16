@@ -109,22 +109,23 @@ def load_resources():
     model_loaded = False
     if os.path.exists(MODEL_PATH):
         try:
-            state = torch.load(MODEL_PATH, map_location=DEVICE, weights_only=True)
-            model.load_state_dict(state)
+            ckpt = torch.load(MODEL_PATH, map_location=DEVICE, weights_only=False)
+            # Unwrap nested checkpoint formats:
+            #   {"state_dict": {...}, "architecture": ..., ...}  ← gin_mutag_checkpoint.pt
+            #   {"model_state_dict": {...}}                       ← alternative convention
+            #   plain state_dict                                  ← bare torch.save(model.state_dict())
+            if isinstance(ckpt, dict):
+                if "state_dict" in ckpt:
+                    ckpt = ckpt["state_dict"]
+                elif "model_state_dict" in ckpt:
+                    ckpt = ckpt["model_state_dict"]
+            model.load_state_dict(ckpt)
             model_loaded = True
-        except Exception:
-            # weights_only=True may fail for older checkpoints — retry with False
-            try:
-                state = torch.load(MODEL_PATH, map_location=DEVICE, weights_only=False)
-                # If the checkpoint wraps more than just a state_dict
-                if isinstance(state, dict) and "model_state_dict" in state:
-                    state = state["model_state_dict"]
-                model.load_state_dict(state)
-                model_loaded = True
-            except Exception as e:
-                st.warning(f"Could not load model weights: {e}")
+        except Exception as e:
+            st.warning(f"Could not load model weights: {e}")
     model.eval()
     return dataset, model, model_loaded
+
 
 
 # ── Draw molecule ─────────────────────────────────────────────────────────────
