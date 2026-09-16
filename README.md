@@ -1,8 +1,7 @@
 # 🧬 Explainable Molecular Property Prediction Using Graph Neural Networks with SubgraphX
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://vishal-gardas-subgraphx-mutag.streamlit.app)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://subgraphx-mutag.streamlit.app)
 
-> **Author:** Vishal Gardas | **Reg No:** 23BAI0114 | VIT Bhopal University
 
 ---
 
@@ -16,7 +15,7 @@ The full system is deployed as an interactive **Streamlit web app** — no code 
 
 ## Live Demo
 
-**[Launch the App →](https://vishal-gardas-subgraphx-mutag.streamlit.app)**
+**[Launch the App →](https://subgraphx-mutag.streamlit.app)**
 
 Pick any of the 188 MUTAG molecules, get a GIN prediction, and run SubgraphX to highlight the key atoms (gold = explanation, blue = rest of molecule).
 
@@ -161,6 +160,3 @@ numpy>=1.24.0
 
 ---
 
-## License
-
-This project is submitted as an academic coursework project at VIT Bhopal University.
